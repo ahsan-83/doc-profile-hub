@@ -7,10 +7,18 @@ import Education from "@/components/Education";
 import Certifications from "@/components/Certifications";
 import Specialty from "@/components/Specialty";
 import Gallery from "@/components/Gallery";
+import Blog from "@/components/Blog";
 import Consultation from "@/components/Consultation";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    google: any;
+    googleTranslateElementInit: () => void;
+  }
+}
 
 const Index = () => {
   useEffect(() => {
@@ -27,8 +35,8 @@ const Index = () => {
     new window.google.translate.TranslateElement(
       {
         pageLanguage: "en",
-        includedLanguages: "en,bn,hi", // include this for selected languages
-        layout: google.translate.TranslateElement.FloatPosition.TOP_LEFT,
+        includedLanguages: "en,bn,hi",
+        layout: window.google.translate.TranslateElement.FloatPosition.TOP_LEFT,
       },
       "google_translate_element"
     );
@@ -47,6 +55,7 @@ const Index = () => {
         <Certifications />
         <Specialty />
         <Gallery />
+        <Blog />
         <Consultation />
         <Contact />
         <Footer />
