@@ -8,6 +8,7 @@ import Certifications from "@/components/Certifications";
 import Specialty from "@/components/Specialty";
 import Gallery from "@/components/Gallery";
 import Blog from "@/components/Blog";
+import FacebookPosts from "@/components/FacebookPosts";
 import Consultation from "@/components/Consultation";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
@@ -56,6 +57,7 @@ const Index = () => {
         <Specialty />
         <Gallery />
         <Blog />
+        <FacebookPosts />
         <Consultation />
         <Contact />
         <Footer />
