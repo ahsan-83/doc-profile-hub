@@ -22,6 +22,8 @@ declare global {
 }
 
 const Index = () => {
+  const [currentLanguage, setCurrentLanguage] = React.useState("en");
+
   useEffect(() => {
     var addScript = document.createElement("script");
     addScript.setAttribute(
@@ -36,19 +38,32 @@ const Index = () => {
     new window.google.translate.TranslateElement(
       {
         pageLanguage: "en",
-        includedLanguages: "en,bn,hi",
-        layout: window.google.translate.TranslateElement.FloatPosition.TOP_LEFT,
+        includedLanguages: "en,bn",
+        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false,
       },
       "google_translate_element"
     );
   };
 
+  const handleLanguageToggle = () => {
+    const newLanguage = currentLanguage === "en" ? "bn" : "en";
+    setCurrentLanguage(newLanguage);
+    
+    // Trigger Google Translate
+    const selectElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+    if (selectElement) {
+      selectElement.value = newLanguage;
+      selectElement.dispatchEvent(new Event("change"));
+    }
+  };
+
   return (
     <>
-      <div id="google_translate_element"></div>
+      <div id="google_translate_element" style={{ display: "none" }}></div>
 
       <div className="min-h-screen bg-background">
-        <Navbar />
+        <Navbar onLanguageToggle={handleLanguageToggle} currentLanguage={currentLanguage} />
         <Hero />
         <About />
         <Experience />
