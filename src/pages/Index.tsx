@@ -52,12 +52,26 @@ const Index = () => {
       "google_translate_element"
     );
     
-    // Set ready state after a short delay to ensure initialization
-    setTimeout(() => setTranslateReady(true), 1000);
+    // Set ready state after ensuring the widget is fully loaded
+    setTimeout(() => {
+      const checkWidget = setInterval(() => {
+        const selectElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+        if (selectElement) {
+          setTranslateReady(true);
+          clearInterval(checkWidget);
+        }
+      }, 100);
+      
+      // Timeout after 5 seconds if widget doesn't load
+      setTimeout(() => clearInterval(checkWidget), 5000);
+    }, 500);
   };
 
   const handleLanguageToggle = () => {
-    if (!translateReady) return;
+    if (!translateReady) {
+      console.log("Google Translate not ready yet");
+      return;
+    }
     
     const newLanguage = currentLanguage === "en" ? "bn" : "en";
     
@@ -65,20 +79,11 @@ const Index = () => {
     const selectElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
     if (selectElement) {
       selectElement.value = newLanguage;
-      const event = new Event("change", { bubbles: true });
-      selectElement.dispatchEvent(event);
+      selectElement.dispatchEvent(new Event("change", { bubbles: true }));
       setCurrentLanguage(newLanguage);
+      console.log("Language changed to:", newLanguage);
     } else {
-      // Retry after a short delay if element not found
-      setTimeout(() => {
-        const retrySelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-        if (retrySelect) {
-          retrySelect.value = newLanguage;
-          const event = new Event("change", { bubbles: true });
-          retrySelect.dispatchEvent(event);
-          setCurrentLanguage(newLanguage);
-        }
-      }, 500);
+      console.error("Google Translate selector not found");
     }
   };
 
