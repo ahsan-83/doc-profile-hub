@@ -23,15 +23,22 @@ declare global {
 
 const Index = () => {
   const [currentLanguage, setCurrentLanguage] = React.useState("en");
+  const [translateReady, setTranslateReady] = React.useState(false);
 
   useEffect(() => {
-    var addScript = document.createElement("script");
+    const addScript = document.createElement("script");
     addScript.setAttribute(
       "src",
       "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
     );
     document.body.appendChild(addScript);
     window.googleTranslateElementInit = googleTranslateElementInit;
+
+    return () => {
+      // Cleanup
+      const scripts = document.querySelectorAll('script[src*="translate.google"]');
+      scripts.forEach(script => script.remove());
+    };
   }, []);
 
   const googleTranslateElementInit = () => {
@@ -44,17 +51,34 @@ const Index = () => {
       },
       "google_translate_element"
     );
+    
+    // Set ready state after a short delay to ensure initialization
+    setTimeout(() => setTranslateReady(true), 1000);
   };
 
   const handleLanguageToggle = () => {
-    const newLanguage = currentLanguage === "en" ? "bn" : "en";
-    setCurrentLanguage(newLanguage);
+    if (!translateReady) return;
     
-    // Trigger Google Translate
+    const newLanguage = currentLanguage === "en" ? "bn" : "en";
+    
+    // Find and trigger the Google Translate selector
     const selectElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
     if (selectElement) {
       selectElement.value = newLanguage;
-      selectElement.dispatchEvent(new Event("change"));
+      const event = new Event("change", { bubbles: true });
+      selectElement.dispatchEvent(event);
+      setCurrentLanguage(newLanguage);
+    } else {
+      // Retry after a short delay if element not found
+      setTimeout(() => {
+        const retrySelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+        if (retrySelect) {
+          retrySelect.value = newLanguage;
+          const event = new Event("change", { bubbles: true });
+          retrySelect.dispatchEvent(event);
+          setCurrentLanguage(newLanguage);
+        }
+      }, 500);
     }
   };
 
